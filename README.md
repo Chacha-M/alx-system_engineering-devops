@@ -1,1 +1,1 @@
-My first readme for task 0
+contains commands and scripts for shell basics and shell permissions
