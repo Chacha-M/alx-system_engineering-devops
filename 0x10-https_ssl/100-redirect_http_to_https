@@ -2,7 +2,7 @@ global
 	log /dev/log	local0
 	log /dev/log	local1 notice
 	chroot /var/lib/haproxy
-	stats socket /run/haproxy/admin.sock mode 660 level admin expose-fd listeners
+	stats socket /run/haproxy/admin.sock mode 660 level admin
 	stats timeout 30s
 	user haproxy
 	group haproxy
@@ -33,14 +33,19 @@ defaults
 	errorfile 503 /etc/haproxy/errors/503.http
 	errorfile 504 /etc/haproxy/errors/504.http
 
-#--nonsogodson-alx.tech-params-begin--
-frontend nonsogodson-alx.tech-http-frontend
-	bind *:80
-	redirect scheme https code 301 if !{ ssl_fc }
+frontend  ehoneah-frontend-http
+        bind *:80
+        mode http
 	http-request set-header X-Forwarded-Proto http
-	default_backend nonsogodson-alx.tech-backend
-backend nonsogodson-alx.tech-backend
-	balance roundrobin
-	server web01 18.209.180.197 check
-	server web02 100.25.111.94 check
-#--nonsogodson-alx.tech-params-end--
+        default_backend ehoneah-backend
+
+frontend ehoneah-frontend-https
+	bind *:443 ssl crt /etc/haproxy/certs/www.ehoneah.tech.pem
+	http-request set-header X-Forwarded-Proto https
+	http-request redirect scheme https code 301 unless { ssl_fc }
+	default_backend ehoneah-backend
+
+backend ehoneah-backend
+        balance roundrobin
+        server 87231-web-01 54.144.129.83:80 check
+        server 87231-web-02 100.26.217.114:80 check
